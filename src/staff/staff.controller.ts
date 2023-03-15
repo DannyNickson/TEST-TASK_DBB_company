@@ -10,6 +10,11 @@ export class StaffController {
   getAll() {
     return this.staffService.getAll();
   }
+  
+  @Get('/salary')
+  getAllStaffSalary(){
+    return this.staffService.getAllCalculatedSalary();
+  }
 
   @Get('/:type')
   getByParam(@Param('type') type: string) {

@@ -128,8 +128,8 @@ export class StaffService {
 
   /**
    * Calculate salary for staff based on their type, base salary, years worked, and subordinate salaries.
-   * @param staffId The ID of the staff member to calculate the salary for.
-   * @returns The calculated salary for the staff member.
+   * @param {String} staffId The ID of the staff member to calculate the salary for.
+   * @returns {Promise<number>} The calculated salary for the staff member.
    * @throws {string} Throws an error if no staff member was found with the given ID.
    */
   async calculateSalary(staffId: string): Promise<number> {
@@ -157,8 +157,8 @@ export class StaffService {
 
   /**
    * Find staff by id
-   * @param id - The id of the staff member to find
-   * @returns A Promise that resolves with the staff member if found, or null if not found
+   * @param {String} id - The id of the staff member to find
+   * @returns {Promise<Staff>} A Promise that resolves with the staff member if found, or null if not found
    */
   async findStaffById(id: string): Promise<Staff> {
     return await this.staffModel.findById(id);
@@ -166,8 +166,8 @@ export class StaffService {
 
   /**
    * Returns all subordinate salaries recursively
-   * @param subordinates An array of subordinate staff members
-   * @returns An array of salaries for all subordinates
+   * @param {Staff[]} subordinates An array of subordinate staff members
+   * @returns {Promise<number[]>} An array of salaries for all subordinates
    */
   private async getAllSubordinateSalaries(subordinates: Staff[]): Promise<number[]> {
     let salaries: number[] = [];
@@ -188,8 +188,8 @@ export class StaffService {
 
   /**
    * Returns salaries for direct subordinates only
-   * @param subordinates An array of subordinate staff members
-   * @returns An array of salaries for direct subordinates only
+   * @param {Staff[]} subordinates An array of subordinate staff members
+   * @returns {Promise<number[]>} An array of salaries for direct subordinates only
    */
   private async getSubordinatesSalaries(subordinates: Staff[]): Promise<number[]> {
     let salaries: number[] = [];
@@ -201,5 +201,28 @@ export class StaffService {
       })
     );
     return salaries;
+  }
+
+  /**
+   * Calculates the salary for staff based on their type, base salary, years worked, and subordinate salaries.
+   *
+   * @returns {Promise<{ staff: Record<string, number>; total: number }>} An object containing the calculated salaries for all staff members and the total salary for all staff members.
+   */
+  async getAllCalculatedSalary(): Promise<{ staff: Record<string, number>; total: number }> {
+    // Retrieves all staff data from the database using the "getAll" method
+    const allStaff: Staff[] = await this.getAll();
+    // Initializes the response object with empty staff and total salary properties
+    const response = { staff: {}, total: 0 };
+    // Executes the calculation for all staff members concurrently
+    await Promise.all(
+      // Maps through each staff member in the "allStaff" array
+      allStaff.map(async (staff: StaffType) => {
+        // Calculates the salary for the current staff member using their ID
+        let salary: number = await this.calculateSalary(staff._id);
+        response.staff[staff.name] = salary;
+        response['total'] += salary;
+      })
+    );
+    return response;
   }
 }
