@@ -1,1 +1,1 @@
-export { Staff, StaffDocument } from './staff.type';
+export { StaffType, StaffDocument } from './staff.type';

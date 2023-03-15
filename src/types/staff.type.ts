@@ -1,11 +1,13 @@
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, ObjectId } from 'mongoose';
 
-export type Staff = {
+export type StaffType = {
+  _id: string;
   name: string;
   joinDate: Date;
   baseSalary: number;
-  type: 'emploee' | 'manager' | 'sales';
-  subordinates: Staff[];
+  type: 'employee' | 'manager' | 'sales';
+  subordinates: StaffType[];
+  supervisor: StaffType;
 };
 
-export type StaffDocument = HydratedDocument<Staff>;
+export type StaffDocument = HydratedDocument<StaffType>;
